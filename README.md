@@ -3,6 +3,11 @@ _Dependency-free full page slides for the web_
 
 A working demo can be found [here](https://ethanchap.com/microslides-demo/).
 
+___v1.1.0 Changes___:
+- Use vertical slides instead of horizontal
+- Automatic disable of page-by-page navigation when page is viewed by a mobile device
+- Mouse/Touchpad scrolling control
+
 ## Usage
 Include these lines in your HTML:
 ```html
