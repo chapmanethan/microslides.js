@@ -5,7 +5,11 @@
  *
  * Copyright (C) 2020 https://ethanchap.com
  */
-var msGetClosest = function (e, selector ) {
+var msCurrentSlide = 0
+	, msIsUpdating = false
+	, msHoldPage = false
+	;
+function msGetClosest(e, selector ) {
 	if (!Element.prototype.matches) {
 		Element.prototype.matches =
 			Element.prototype.matchesSelector ||
@@ -25,45 +29,85 @@ var msGetClosest = function (e, selector ) {
 		if ( e.matches( selector ) ) return e;
 	}
 	return null;
-};
+}
+function msIsMobile(){
+	x = [/Android/i, /BlackBerry/i, /iPhone|iPad|iPod/i, /Opera Mini/i, /IEMobile/i]
+	for(i=0;i<x.length;i++){if(navigator.userAgent.match(x[i])){return true}}
+	return false
+}
 function msInit(){
 	var x = document.querySelectorAll(".ms-slides > .ms-slide")
 		, i
 		;
-	// Label and transform slides
-	for (i = 0; i < x.length; i++) {
-		x[i].dataset.slide = i;
-		x[i].style["z-index"] = i;
-		if (i == 0) {
-			x[i].classList.add("ms-focus");
+	if (msIsMobile() == false){
+		window.addEventListener("wheel", msWatchScroll, {passive: true});
+		document.querySelector(".ms-slides").classList.add("ms-viewport");
+		// Label and transform slides
+		for (i = 0; i < x.length; i++) {
+			x[i].dataset.slide = i;
+			x[i].style["z-index"] = i;
+			x[i].classList.add("ms-pane");
+			if(i==0){x[i].classList.add("ms-focus")}else{x[i].classList.add("ms-below")}
 		}
 	}
-	x = document.querySelectorAll(".ms-slides button[data-control]");
-	for (i = 0; i < x.length; i++) {
-		x[i].addEventListener("click", msChangeSlide);
+	y = document.querySelectorAll(".ms-slides *[data-control]");
+	for (i = 0; i < y.length; i++) {
+		if (msIsMobile()){
+			// Remove all Slide Navigation buttons
+			y[i].style["display"] = "none";
+		} else {
+			y[i].addEventListener("click", msChangeSlide);
+		}
 	}
 }
 function msChangeSlide(e){
 	if (e.target.dataset.control == "previous") {
-		change = -1;
+		d = -1;
 	} else {
-		change = 1;
+		d = 1;
 	}
-	var current_slide = msGetClosest(e.target, ".ms-slide");
-	var current = parseInt(current_slide.dataset.slide);
-	var next = current + change;
-	var next_slide = document.querySelector(`*[data-slide='${next}']`);
-	document.querySelector(".ms-slides").dataset.viewing = next_slide.dataset.slide;
+	msUpdateSlide(d);
+}
+function msUpdateSlide(d){
+	if (msIsUpdating) {
+		return
+	}
+	msIsUpdating = true;
 
-	next_slide.style.visibility = "visible";
-	if (change == 1) {
-		next_slide.classList.add("ms-focus");
-	} else{
-		current_slide.classList.remove("ms-focus");
+	var current = document.querySelector(`*[data-slide='${msCurrentSlide}']`);
+	var nextSlide = msCurrentSlide + d;
+	var next = document.querySelector(`*[data-slide='${nextSlide}']`);
+
+	if (next == null){
+		msIsUpdating = false
+		return
 	}
+	document.querySelector(".ms-slides").dataset.viewing = next.dataset.slide;
+
+	msCurrentSlide = nextSlide;
+	next.style.visibility = "visible";
+
+	next.classList.add("ms-focus");
+	next.classList.remove("ms-below");
+	next.classList.remove("ms-above");
+
+	current.classList.remove("ms-focus");
+	if (d==1) {
+		current.classList.add("ms-above");
+	} else {
+		current.classList.add("ms-below");
+	}
+
 	setTimeout(function(){
-		if (document.querySelector(".ms-slides").dataset.viewing != current_slide.dataset.slide) {
-			current_slide.style.visibility = "hidden";
+		if (document.querySelector(".ms-slides").dataset.viewing != current.dataset.slide) {
+			current.style.visibility = "hidden";
 		}
-	}, 600);
+		msIsUpdating = false;
+	}, 500);
+}
+function msWatchScroll(event){
+	if (msHoldPage == false) {
+		d = Math.sign(event.deltaY)
+		msUpdateSlide(d)
+	}
 }

@@ -6,6 +6,9 @@
  * Copyright (C) 2020 https://ethanchap.com
  */
 .ms-slides{
+
+}
+.ms-viewport{
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -14,14 +17,21 @@
 	overflow: hidden;
 }
 .ms-slide{
-	left: 100%;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	position: absolute;
 	background-color: #fff;
-	transition: left .4s ease;
+	transition: .4s ease;
+}
+.ms-pane{
+	position: absolute;
 }
 .ms-focus{
-	left: 0%;
+	top: 0%;
+}
+.ms-above{
+	top: -100%;
+}
+.ms-below{
+	top: 100%;
 }
