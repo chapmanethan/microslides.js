@@ -61,17 +61,12 @@ function msInit(){
 	}
 }
 function msChangeSlide(e){
-	if (e.target.dataset.control == "previous") {
-		d = -1;
-	} else {
-		d = 1;
-	}
+	if(e.target.dataset.control=="previous"){d= -1}else{d=1}
 	msUpdateSlide(d);
 }
 function msUpdateSlide(d){
-	if (msIsUpdating) {
-		return
-	}
+	if(msIsUpdating){return}
+	if(d!=1&&d!= -1){return}
 	msIsUpdating = true;
 
 	var current = document.querySelector(`*[data-slide='${msCurrentSlide}']`);
