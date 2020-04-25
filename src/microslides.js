@@ -41,6 +41,7 @@ function msInit(){
 		;
 	if (msIsMobile() == false){
 		window.addEventListener("wheel", msWatchScroll, {passive: true});
+		window.addEventListener('keydown', msCheckKey)
 		document.querySelector(".ms-slides").classList.add("ms-viewport");
 		// Label and transform slides
 		for (i = 0; i < x.length; i++) {
@@ -100,9 +101,13 @@ function msUpdateSlide(d){
 		msIsUpdating = false;
 	}, 500);
 }
-function msWatchScroll(event){
+function msWatchScroll(e){
 	if (msHoldPage == false) {
-		d = Math.sign(event.deltaY)
+		d = Math.sign(e.deltaY)
 		msUpdateSlide(d)
 	}
+}
+function msCheckKey(e) {
+	if(e.keyCode=='38'){msUpdateSlide(-1)}
+  else if(e.keyCode=='40'){msUpdateSlide(1)}
 }
